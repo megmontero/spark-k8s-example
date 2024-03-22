@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spark-driver
+  labels:
+    app: spark-driver
+spec:
+  replicas: 1
+  serviceName: spark-driver-headless
+  selector:
+    matchLabels:
+      app: spark-driver 
+  template:
+    metadata:
+      labels:
+        app: spark-driver
+    spec:
+      serviceAccountName: spark
+      containers:
+      - name: spark
+        image: "manuelgm/spark-jupyter:3.5.1"
+        env:
+          - name: JUPYTER_ALLOW_INSECURE_WRITES
+            value: "true"
+        ports:
+          - name: jupyter
+            containerPort: 8888
+            protocol: TCP
+          - name: sparkui
+            containerPort: 4040
+            protocol: TCP 
+          - name: driver
+            protocol: TCP
+            containerPort: 2222
+          - name: blockmanager
+            protocol: TCP 
+            containerPort: 7777
+        volumeMounts:
+          - name: data
+            mountPath: /home/spark
+        resources:
+          requests:
+            cpu: 900m
+            memory: 2Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+      volumes:
+       - name: data
+         persistentVolumeClaim:
+           claimName: driver-data

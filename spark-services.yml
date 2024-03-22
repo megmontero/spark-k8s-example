@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-driver
+  labels: 
+    app: spark-driver
+spec:
+  type: LoadBalancer
+  selector:
+    app: spark-driver
+  ports:
+  - name: jupyter
+    port: 8888
+    protocol: TCP
+  - name: sparkui
+    port: 4040
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-driver-headless
+  labels: 
+    app: spark-driver
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: spark-driver
+  ports:
+  - name: jupyter
+    port: 8888
+    protocol: TCP
+  - name: sparkui
+    port: 4040
+    protocol: TCP
+  - name: blockmanager
+    port: 7777
+    protocol: TCP 
+  - name: driver
+    port: 2222
+    protocol: TCP
